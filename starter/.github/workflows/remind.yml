@@ -1,0 +1,36 @@
+name: Calendar Caller Reminders
+
+on:
+  schedule:
+    # Every 15 minutes
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+jobs:
+  remind:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install deps
+        run: |
+          if [ -f package.json ]; then npm ci; else echo "no package.json — using plain node"; fi
+
+      - name: Poll calendars + ring
+        env:
+          CALLMEBOT_TELEGRAM_USER: ${{ secrets.CALLMEBOT_TELEGRAM_USER }}
+          CALLMEBOT_LANG: ${{ secrets.CALLMEBOT_LANG }}
+          CALLMEBOT_REPEAT: ${{ secrets.CALLMEBOT_REPEAT }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN_PERSONAL: ${{ secrets.GOOGLE_REFRESH_TOKEN_PERSONAL }}
+          GOOGLE_REFRESH_TOKEN_WORK: ${{ secrets.GOOGLE_REFRESH_TOKEN_WORK }}
+          TZ_DISPLAY: America/Chicago
+        run: node starter/run-once.js
+
+# Gotcha: GitHub pauses scheduled workflows after ~60 days of repo inactivity.
+# Push a keepalive commit or re-enable Actions if reminders go silent.
