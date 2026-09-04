@@ -3,9 +3,10 @@
  * Wire googleapis OAuth refresh tokens for each Gmail, then run on cron.
  *
  * Reminder windows are rule-driven. Example:
- *   client/interview → 60m + 15m
- *   personal default → 30m
+ *   client/interview/strategy/kickoff → 60m + 15m + 5m
+ *   default (including site-booking GCal events) → 15m + 5m
  * Dashboard overrides win over rules.
+ * Site-booking events stay in this stream — do not skip da-site-booking stamps.
  */
 
 import { placeTelegramCall, buildSpokenMessage, buildTextMessage } from "./callmebot.js";
@@ -18,12 +19,12 @@ const RULES = [
   {
     id: "client",
     match: (e) => /client|interview|strategy|kickoff/i.test(e.title || ""),
-    windows: [60, 15],
+    windows: [60, 15, 5],
   },
   {
     id: "personal-default",
     match: () => true,
-    windows: [30],
+    windows: [15, 5],
   },
 ];
 
@@ -43,7 +44,7 @@ function minutesUntil(startIso) {
 }
 
 function inWindow(minsUntil, windowMin, slack = 7) {
-  // Cron every 15m: fire when within [windowMin - slack, windowMin]
+  // Cron every 5m: fire when within (windowMin - slack, windowMin]
   return minsUntil <= windowMin && minsUntil > windowMin - slack;
 }
 
@@ -54,7 +55,7 @@ function resolveWindows(event, override) {
   for (const rule of RULES) {
     if (rule.match(event)) return rule.windows;
   }
-  return [30];
+  return [15, 5];
 }
 
 function extractMeetLink(event) {

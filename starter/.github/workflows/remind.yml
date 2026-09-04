@@ -2,8 +2,8 @@ name: Calendar Caller Reminders
 
 on:
   schedule:
-    # Every 15 minutes
-    - cron: "*/15 * * * *"
+    # Every 5 minutes so the 5-minute reminder window can fire
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 jobs:
