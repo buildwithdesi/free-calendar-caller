@@ -16,7 +16,7 @@ Follow the README + starter/ files exactly:
 2. Poll Google Calendar (support 1-2 Gmails with prompt=select_account)
 3. Rules + optional overrides for which events ring and minutes-before
 4. Idempotent call log so I never get double-called
-5. GitHub Actions cron every 15 minutes (starter/.github/workflows/remind.yml)
+5. GitHub Actions cron every 5 minutes (starter/.github/workflows/remind.yml)
 6. Spoken times must use America/Chicago (or ask me my timezone)
 7. Telegram text should include Meet link + location when present
 
